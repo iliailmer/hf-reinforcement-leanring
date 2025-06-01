@@ -7,6 +7,11 @@ requires-python = ">=3.12"
 dependencies = [
     "gymnasium[other]>=1.1.1",
     "huggingface-sb3>=3.0",
+    "imageio>=2.37.0",
+    "imageio-ffmpeg>=0.6.0",
+    "pygame>=2.6.1",
+    "pyglet==1.5.1",
+    "pyvirtualdisplay>=3.0",
     "swig>=4.3.1",
     "transformers>=4.52.3",
 ]
