@@ -153,7 +153,7 @@ def push_to_hub(repo_id, model, env, video_fps=1, local_repo_path="hub"):
 
     readme_path = repo_local_path / "README.md"
     readme = ""
-    print(readme_path.exists())
+    print("Readme Exists?", readme_path.exists())
     if readme_path.exists():
         with readme_path.open("r", encoding="utf8") as f:
             readme = f.read()
