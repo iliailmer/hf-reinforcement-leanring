@@ -228,8 +228,6 @@ def train(
 
         # repeat
         for step in range(max_steps):
-            if (step + 1) % 100 == 0:
-                print(f"STEP {step + 1}")
             # Choose the action At using epsilon greedy policy
             action = epsilon_greedy_policy(Qtable, state, epsilon=epsilon, env=env)
 
@@ -271,8 +269,6 @@ def evaluate_agent(env, max_steps, n_eval_episodes, Q, seed):
         total_rewards_ep = 0
 
         for step in range(max_steps):
-            if (1 + step) % 100 == 0:
-                print(f"STEP: {1 + step}")
             # Take the action (index) that have the maximum expected future reward given that state
             action = greedy_policy(Q, state)
             new_state, reward, terminated, truncated, _ = env.step(action)
