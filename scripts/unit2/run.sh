@@ -31,14 +31,14 @@
 #
 uv run $HOME/projects/hf-reinforcement-leanring/scripts/unit2/unit2.py \
   --n_training_episodes=1000000 \
-  --learning_rate=0.5 \
+  --learning_rate=0.05 \
   --n_eval_episodes=100 \
   --env_id="Taxi-v3" \
   --max_steps=500 \
-  --gamma=0.95 \
+  --gamma=0.99 \
   --max_epsilon=1.0 \
   --min_epsilon=0.01 \
-  --decay_rate=5e-4 \
+  --decay_rate=5e-3 \
   --username=$HF_UNAME \
   --repo_name="q-Taxi-v3-4x4" \
   --save_config_path="$HOME/projects/hf-reinforcement-leanring/scripts/unit2/config-taxi-v3.json"

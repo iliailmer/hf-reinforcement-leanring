@@ -1,3 +1,4 @@
+from argparse import Namespace
 import datetime
 import json
 import pickle
@@ -26,7 +27,7 @@ def record_video(env, Qtable, out_directory, fps=1):
     state, _ = env.reset(seed=random.randint(0, 500))
     img = env.render()
     images.append(img)
-    while not terminated or truncated:
+    while not (terminated or truncated):
         action = np.argmax(Qtable[state][:])
         state, _, terminated, truncated, _ = env.step(action)
         img = env.render()
@@ -215,8 +216,12 @@ def train(
     Qtable: np.array,  # pyright: ignore
     learning_rate: float,
     gamma: float,
+    n_eval_episodes: int,
+    eval_seed: list,
 ):
-    for episode in tqdm(range(n_training_episodes)):
+    pbar = tqdm(range(n_training_episodes))
+
+    for episode in pbar:
         # Reduce epsilon (because we need less and less exploration)
         epsilon = min_epsilon + (max_epsilon - min_epsilon) * np.exp(
             -decay_rate * episode
@@ -225,9 +230,19 @@ def train(
         state, _ = env.reset()
         terminated = False
         truncated = False
+        if (episode + 1) % 50 == 0:
+            eval_env = gym.make(env.spec.id)
+            (mean_reward, stdev_reward) = evaluate_agent(
+                eval_env,
+                max_steps=max_steps,
+                n_eval_episodes=n_eval_episodes,
+                Q=Qtable,
+                seed=eval_seed,
+            )
+            pbar.set_description_str(f"EVAL: {mean_reward:.2f} +/- {stdev_reward:.2f}")
+            pbar.set_postfix_str(f"EPI: {episode} EPS: {epsilon:.3f}")
 
-        # repeat
-        for step in range(max_steps):
+        for _ in range(max_steps):
             # Choose the action At using epsilon greedy policy
             action = epsilon_greedy_policy(Qtable, state, epsilon=epsilon, env=env)
 
@@ -259,7 +274,7 @@ def evaluate_agent(env, max_steps, n_eval_episodes, Q, seed):
     :param seed: The evaluation seed array (for taxi-v3)
     """
     episode_rewards = []
-    for episode in tqdm(range(n_eval_episodes)):
+    for episode in range(n_eval_episodes):
         if seed:
             state, _ = env.reset(seed=seed[episode])
         else:

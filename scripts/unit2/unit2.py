@@ -73,6 +73,9 @@ def parse_args():
         default="config.json",
         help="Path to save the config as JSON",
     )
+    parser.add_argument(
+        "--push_to_hub", action="store_true", help="Push model to HuggingFace Hub"
+    )
     return parser.parse_args()
 
 
@@ -221,8 +224,9 @@ if __name__ == "__main__":
         q_table,
         args.learning_rate,
         args.gamma,
+        args.n_eval_episodes,
+        eval_seed,
     )
-    print(q_table)
 
     mean_reward, std_reward = evaluate_agent(
         env, args.max_steps, args.n_eval_episodes, q_table, eval_seed
@@ -245,5 +249,5 @@ if __name__ == "__main__":
         "decay_rate": args.decay_rate,
         "qtable": q_table,
     }
-
-    push_to_hub(repo_id=f"{args.username}/{args.repo_name}", model=model, env=env)
+    if args.push_to_hub:
+        push_to_hub(repo_id=f"{args.username}/{args.repo_name}", model=model, env=env)
