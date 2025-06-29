@@ -5,7 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "gymnasium[other]>=1.1.1",
+    "gymnasium[accept-rom-license,atari,other]>=1.1.1",
     "huggingface-sb3>=3.0",
     "imageio>=2.37.0",
     "imageio-ffmpeg>=0.6.0",
