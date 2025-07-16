@@ -64,7 +64,7 @@ def reinforce(
 def evaluate(env, max_eval_steps, n_eval_episodes, policy: Policy):
     rewards = []
     for ep in range(n_eval_episodes):
-        state, _ = env.reset()[0]
+        state, _ = env.reset()
         episode_rewards = 0
         for step in range(max_eval_steps):
             action, _ = policy.act(state)

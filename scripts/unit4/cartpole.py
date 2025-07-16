@@ -1,35 +1,35 @@
-# TODO: Record video and PUBLISH TO Hub
 # TODO: Second simulatiuon
 
 import gymnasium as gym
 import torch.optim as optim
-
+from loguru import logger
 
 from .policy import Policy
-from .reinforce import reinforce, evaluate
+from .reinforce import evaluate, reinforce
 from .utils import push_to_hub
-
 
 if __name__ == "__main__":
     env_id = "CartPole-v1"
     # Create the env
-    env = gym.make(env_id)
+    env = gym.make(env_id, render_mode="rgb_array")
 
     # Create the evaluation env
-    eval_env = gym.make(env_id)
+    eval_env = gym.make(env_id, render_mode="rgb_array")
 
     # Get the state space and action space
     s_size = env.observation_space.shape[0]
-    a_size = env.action_space.n  # pyright: ignore
+    a_size = int(env.action_space.n)  # pyright: ignore
 
-    print("_____OBSERVATION SPACE_____ \n")
-    print("The State Space is: ", s_size)
-    print(
-        "Sample observation", env.observation_space.sample()
+    logger.info("_____OBSERVATION SPACE_____ \n")
+    logger.info("The State Space is: {}", s_size)
+    logger.info(
+        "Sample observation {}", env.observation_space.sample()
     )  # Get a random observation
-    print("\n _____ACTION SPACE_____ \n")
-    print("The Action Space is: ", a_size)
-    print("Action Space Sample", env.action_space.sample())  # Take a random action
+    logger.info("\n _____ACTION SPACE_____ \n")
+    logger.info("The Action Space is: {}", a_size)
+    logger.info(
+        "Action Space Sample {}", env.action_space.sample()
+    )  # Take a random action
     cartpole_hyperparameters = {
         "h_size": 16,
         "n_training_episodes": 1000,
@@ -41,6 +41,8 @@ if __name__ == "__main__":
         "state_space": s_size,
         "action_space": a_size,
     }
+    logger.info("Cartpole Hyperparameters:")
+    logger.info(cartpole_hyperparameters)
     cartpole_policy = Policy(
         cartpole_hyperparameters["state_space"],
         cartpole_hyperparameters["action_space"],

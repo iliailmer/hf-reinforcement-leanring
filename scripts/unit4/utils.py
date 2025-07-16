@@ -1,20 +1,32 @@
 import datetime
 import json
-import os
 import tempfile
 from pathlib import Path
 
+from gymnasium import Env
+from gymnasium.wrappers import RecordVideo
 import imageio
 import numpy as np
-from huggingface_hub import HfApi, snapshot_download
+from huggingface_hub import HfApi
 from huggingface_hub.repocard import metadata_eval_result, metadata_save
 
 import torch
 
+from .policy import Policy
+
 from .reinforce import evaluate
 
+from loguru import logger
 
-def push_to_hub(repo_id, model, hyperparameters, eval_env, video_fps=30):
+
+@logger.catch
+def push_to_hub(
+    repo_id: str,
+    model: Policy,
+    hyperparameters: dict,
+    eval_env: Env,
+    video_fps: int = 30,
+):
     """
     Evaluate, Generate a video and Upload a model to Hugging Face Hub.
     This method does the complete pipeline:
@@ -134,7 +146,7 @@ def push_to_hub(repo_id, model, hyperparameters, eval_env, video_fps=30):
         )
 
 
-def record_video(env, policy, out_directory, fps=30):
+def record_video(env: Env, policy: Policy, out_directory, fps=30):
     """
     Generate a replay video of the agent
     :param env
@@ -142,19 +154,20 @@ def record_video(env, policy, out_directory, fps=30):
     :param out_directory
     :param fps: how many frame per seconds (with taxi-v3 and frozenlake-v1 we use 1)
     """
+    # env = RecordVideo(env, out_directory)
     images = []
     done = False
-    state = env.reset()
-    img = env.render(mode="rgb_array")
-    images.append(img)
+    state, _ = env.reset()
     while not done:
         # Take the action (index) that have the maximum expected future reward given that state
         action, _ = policy.act(state)
-        state, reward, done, info = env.step(
-            action
-        )  # We directly put next_state = state for recording logic
-        img = env.render(mode="rgb_array")
+        logger.info(f"State: {state}")
+        logger.info(f"Action: {action}")
+        # We directly put next_state = state for recording logic
+        state, reward, terminated, truncated, info = env.step(action)
+        img = env.render()
         images.append(img)
+        done = terminated or truncated
     imageio.mimsave(
         out_directory, [np.array(img) for i, img in enumerate(images)], fps=fps
     )
