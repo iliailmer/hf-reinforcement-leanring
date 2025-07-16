@@ -4,11 +4,10 @@
 import gymnasium as gym
 import torch.optim as optim
 
-from loguru import logger
 
 from .policy import Policy
 from .reinforce import reinforce, evaluate
-from utils import push_to_hub
+from .utils import push_to_hub
 
 
 if __name__ == "__main__":
