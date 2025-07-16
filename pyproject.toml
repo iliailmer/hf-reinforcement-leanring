@@ -5,23 +5,23 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "gymnasium[accept-rom-license,atari,other]>=1.1.1",
-    "huggingface-sb3>=3.0",
-    "imageio>=2.37.0",
-    "imageio-ffmpeg>=0.6.0",
-    "pygame>=2.6.1",
-    "pyglet==1.5.1",
-    "pyvirtualdisplay>=3.0",
-    "swig>=4.3.1",
-    "transformers>=4.52.3",
+  "gymnasium[accept-rom-license,atari,other]>=1.1.1",
+  "huggingface-sb3>=3.0",
+  "imageio>=2.37.0",
+  "imageio-ffmpeg>=0.6.0",
+  "loguru>=0.7.3",
+  "pygame>=2.6.1",
+  "pyglet==1.5.1",
+  "pyvirtualdisplay>=3.0",
+  "swig>=4.3.1",
+  "torch>=2.7.1",
+  "transformers>=4.52.3",
 ]
 
 [tool.pyright]
-venv=".venv"
-venvPath="."
+venv = ".venv"
+venvPath = "."
+reportOptionalSubscript = false
 
 [dependency-groups]
-dev = [
-    "ipython>=9.2.0",
-    "ty>=0.0.1a6",
-]
+dev = ["ipython>=9.2.0", "ty>=0.0.1a6"]
