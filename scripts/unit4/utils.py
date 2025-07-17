@@ -12,7 +12,7 @@ from huggingface_hub.repocard import metadata_eval_result, metadata_save
 
 import torch
 
-from .policy import Policy
+from .policy import Policy, PolicyV2
 
 from .reinforce import evaluate
 
@@ -22,7 +22,7 @@ from loguru import logger
 @logger.catch
 def push_to_hub(
     repo_id: str,
-    model: Policy,
+    model: Policy | PolicyV2,
     hyperparameters: dict,
     eval_env: Env,
     video_fps: int = 30,
@@ -146,7 +146,9 @@ def push_to_hub(
         )
 
 
-def record_video(env: Env, policy: Policy, out_directory, fps=30):
+def record_video(
+    env: Env, policy: Policy | PolicyV2, out_directory: str | Path, fps: int = 30
+):
     """
     Generate a replay video of the agent
     :param env
@@ -165,7 +167,11 @@ def record_video(env: Env, policy: Policy, out_directory, fps=30):
         logger.info(f"Action: {action}")
         # We directly put next_state = state for recording logic
         state, reward, terminated, truncated, info = env.step(action)
-        img = env.render()
+        try:
+            img = env.render()
+        except ImportError as ie:
+            logger.error(ie)
+            img = env.render("rgb_array")
         images.append(img)
         done = terminated or truncated
     imageio.mimsave(

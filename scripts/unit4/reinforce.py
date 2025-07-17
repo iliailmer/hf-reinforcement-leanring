@@ -1,17 +1,18 @@
 from collections import deque
 
+from gymnasium import Env
 import numpy as np
 import torch
 from loguru import logger
 from torch import optim
 
-from .policy import Policy
+from .policy import Policy, PolicyV2
 
 
 @logger.catch
 def reinforce(
     env,
-    policy: Policy,
+    policy: Policy | PolicyV2,
     optimizer: optim.Optimizer,
     n_training_episodes: int,
     max_t: int,
@@ -61,15 +62,17 @@ def reinforce(
 
 
 @logger.catch
-def evaluate(env, max_eval_steps, n_eval_episodes, policy: Policy):
+def evaluate(
+    env: Env, max_eval_steps: int, n_eval_episodes: int, policy: Policy | PolicyV2
+):
     rewards = []
     for ep in range(n_eval_episodes):
         state, _ = env.reset()
-        episode_rewards = 0
+        episode_rewards = 0.0
         for step in range(max_eval_steps):
             action, _ = policy.act(state)
             new_state, reward, terminated, truncated, info = env.step(action)
-            episode_rewards += reward
+            episode_rewards = episode_rewards + float(reward)
             if terminated or truncated:
                 break
             state = new_state

@@ -22,6 +22,7 @@ dependencies = [
 venv = ".venv"
 venvPath = "."
 reportOptionalSubscript = false
+typeCheckingMode = "standard"
 
 [dependency-groups]
 dev = ["ipython>=9.2.0", "ty>=0.0.1a6"]

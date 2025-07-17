@@ -1,5 +1,3 @@
-# TODO: Second simulatiuon
-
 import gymnasium as gym
 import torch.optim as optim
 from loguru import logger
