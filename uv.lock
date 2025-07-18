@@ -186,6 +186,21 @@ wheels = [
 ]
 
 [[package]]
+name = "flappy-bird-gymnasium"
+version = "0.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "gymnasium" },
+    { name = "matplotlib" },
+    { name = "numpy" },
+    { name = "pygame" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6a/46/de0965899428dccfe14d9f5242f7fbaca91d66a083d6bcbc380567cffcdd/flappy-bird-gymnasium-0.4.0.tar.gz", hash = "sha256:78358e9a73740e5214b6bb7d965971bc645d9baecc092c86ef02726b9d62347b", size = 37321242, upload-time = "2024-02-29T13:12:51.572Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ad/86/21717daf58d737671f5f08f8bd2e39cabe401f9c17a9d97765bfb81eb858/flappy_bird_gymnasium-0.4.0-py3-none-any.whl", hash = "sha256:f215be1d747320a3b07b6934ed0d08ac7ee8fbf50dd45a5be77b7381a6ebf880", size = 37336957, upload-time = "2024-02-29T13:12:46.665Z" },
+]
+
+[[package]]
 name = "fonttools"
 version = "4.58.0"
 source = { registry = "https://pypi.org/simple" }
@@ -250,6 +265,7 @@ name = "hf-reinforcement-leanring"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "flappy-bird-gymnasium" },
     { name = "gymnasium", extra = ["atari", "other"] },
     { name = "huggingface-sb3" },
     { name = "imageio" },
@@ -271,6 +287,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "flappy-bird-gymnasium", specifier = ">=0.4.0" },
     { name = "gymnasium", extras = ["accept-rom-license", "atari", "other"], specifier = ">=1.1.1" },
     { name = "huggingface-sb3", specifier = ">=3.0" },
     { name = "imageio", specifier = ">=2.37.0" },

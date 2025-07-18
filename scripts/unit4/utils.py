@@ -1,3 +1,4 @@
+from collections import deque
 import datetime
 import json
 import tempfile
@@ -12,9 +13,9 @@ from huggingface_hub.repocard import metadata_eval_result, metadata_save
 
 import torch
 
-from .policy import Policy, PolicyV2
+from .policy import BasePolicy, Policy, PolicyV2
 
-from .reinforce import evaluate
+from .reinforce import evaluate, evaluate_conv
 
 from loguru import logger
 
@@ -22,7 +23,7 @@ from loguru import logger
 @logger.catch
 def push_to_hub(
     repo_id: str,
-    model: Policy | PolicyV2,
+    model: BasePolicy,
     hyperparameters: dict,
     eval_env: Env,
     video_fps: int = 30,
@@ -62,11 +63,12 @@ def push_to_hub(
             json.dump(hyperparameters, outfile)
 
         # Step 4: Evaluate the model and build JSON
-        mean_reward, std_reward = evaluate(
+        mean_reward, std_reward = evaluate_conv(
             eval_env,
             hyperparameters["max_t"],
             hyperparameters["n_evaluation_episodes"],
             model,
+            n_frames=hyperparameters["n_frames"],
         )
         # Get datetime
         eval_datetime = datetime.datetime.now()
@@ -147,7 +149,11 @@ def push_to_hub(
 
 
 def record_video(
-    env: Env, policy: Policy | PolicyV2, out_directory: str | Path, fps: int = 30
+    env: Env,
+    policy: Policy | PolicyV2,
+    out_directory: str | Path,
+    fps: int = 30,
+    n_frames: int = 4,
 ):
     """
     Generate a replay video of the agent
@@ -160,18 +166,17 @@ def record_video(
     images = []
     done = False
     state, _ = env.reset()
+    frames = deque(maxlen=n_frames)
+    for _ in range(n_frames):
+        frames.append(env.render())
     while not done:
         # Take the action (index) that have the maximum expected future reward given that state
-        action, _ = policy.act(state)
-        logger.info(f"State: {state}")
-        logger.info(f"Action: {action}")
+        stacked = np.stack(frames, axis=0) / 255.0
+        action, _ = policy.act(frames=stacked, state=state)
         # We directly put next_state = state for recording logic
         state, reward, terminated, truncated, info = env.step(action)
-        try:
-            img = env.render()
-        except ImportError as ie:
-            logger.error(ie)
-            img = env.render("rgb_array")
+        img = env.render()
+        frames.append(img)
         images.append(img)
         done = terminated or truncated
     imageio.mimsave(

@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+  "flappy-bird-gymnasium>=0.4.0",
   "gymnasium[accept-rom-license,atari,other]>=1.1.1",
   "huggingface-sb3>=3.0",
   "imageio>=2.37.0",
