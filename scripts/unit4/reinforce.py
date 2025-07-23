@@ -86,6 +86,7 @@ def reinforce_conv(
     env,
     policy: BasePolicy,
     optimizer: optim.Optimizer,
+    scheduler: optim.lr_scheduler.LRScheduler,
     n_training_episodes: int,
     max_t: int,
     n_frames: int,
@@ -126,12 +127,21 @@ def reinforce_conv(
         returns = torch.tensor(returns)
         returns = (returns - returns.mean()) / (eps + returns.std())
         loss = torch.tensor(0.0)
+        entropy = 0.0
         for t in range(n_steps):
-            loss += -episode_log_probas[t].squeeze() * returns[t]
+            log_prob = episode_log_probas[t].squeeze()
+            Gt = returns[t]
+            loss += -log_prob * Gt
+            # loss += -episode_log_probas[t].squeeze() * returns[t]
+            entropy += -log_prob.exp() * log_prob
 
+        entropy_coef = 0.01  # WARN: tune this
+        loss = loss - entropy_coef * entropy
         optimizer.zero_grad()
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(policy.parameters(), max_norm=1.0)
         optimizer.step()
+        scheduler.step()
 
         if i % print_every == 0:
             logger.info(
@@ -160,10 +170,10 @@ def evaluate_conv(
             action, _ = policy.act(frames=np.stack(frames, axis=0) / 255, state=state)
             state, reward, terminated, truncated, info = env.step(action)
             episode_rewards = episode_rewards + float(reward)
-            if terminated or truncated:
-                break
             frames.append(env.render())
             rewards.append(episode_rewards)
+            if terminated or truncated:
+                break
     mean_reward = np.mean(rewards)
     std_reward = np.std(rewards)
     logger.info(f"EVAL: Mean reward {mean_reward:.2f}+/-{std_reward:.2f}")

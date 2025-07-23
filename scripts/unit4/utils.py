@@ -134,7 +134,9 @@ def push_to_hub(
 
         # Step 6: Record a video
         video_path = local_directory / "replay.mp4"
-        record_video(eval_env, model, video_path, video_fps)
+        record_video(
+            eval_env, model, video_path, video_fps, n_frames=hyperparameters["n_frames"]
+        )
 
         # Step 7. Push everything to the Hub
         api.upload_folder(
@@ -150,7 +152,7 @@ def push_to_hub(
 
 def record_video(
     env: Env,
-    policy: Policy | PolicyV2,
+    policy: BasePolicy,
     out_directory: str | Path,
     fps: int = 30,
     n_frames: int = 4,
